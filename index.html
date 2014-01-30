@@ -45,7 +45,243 @@
 				</section>
 
 				<section>
-					<h2>Fundamentals</h2>
+					<h2>What is TripleO?</h2>
+					<p>
+						<blockquote cite="https://wiki.openstack.org/wiki/TripleO">
+							&ldquo;TripleO is a program aimed at installing, upgrading and operating OpenStack clouds using OpenStack's own cloud facilities as the foundations - building on Nova, Neutron Heat and Ironic to automate fleet management at datacentre scale (and scaling down to as few as 2 machines).&rdquo;
+						</blockquote>
+					</p>
+					<aside class="notes">
+						Hello World!
+					</aside>
+				</section>
+
+				<section>
+					<h2>Goals</h2>
+					<p>
+						<ul>
+							<li>deploy OpenStack</li>
+							<li>using OpenStack</li>
+							<li>on baremetal machines</li>
+							<li>at datacentre scale</li>
+							<li>CI/CD pipeline</li>
+							<li>upgrades</li>
+							<li>operating</li>
+						</ul>
+					</p>
+					<aside class="notes">
+						CI/CD pipeline: application + library updates, installation and removal of packages, operation system version updates
+					</aside>
+				</section>
+
+				<section>
+					<section id="fragments">
+						<h2>How to deploy a VM?</h2>
+						<p class="fragment">Goal: deploy an image using OpenStack and configure it</p>
+						<ol>
+							<li class="fragment">grab an image</li>
+							<li class="fragment">deploy</li>
+							<li class="fragment">configure</li>
+						</ol>
+
+						<aside class="notes">
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<h2>How to deploy a VM? - Solution #1</h2>
+					<pre><code data-trim>
+nova boot myCentOSServer \
+  --image "3afe97b2-26dc-49c5-a2cc-a2fc8d80c001" \
+  --flavor m1.small
+					</code></pre>
+
+					<p>Use Puppet, Chef, Ansible or whatever for configuration</p>
+					<aside class="notes">
+					</aside>
+				</section>
+
+				<section>
+					<section>
+						<h2>How to deploy a VM? - Solution #2</h2>
+						<p><strong>Use Heat!</strong></p>
+						<aside class="notes">
+						</aside>
+					</section>
+
+					<section>
+						<h2>Heat template</h2>
+
+						<pre><code data-trim>
+heat_template_version: 2013-05-23
+
+description:
+  ...
+
+parameters:
+  ...
+
+resources:
+  ...
+
+outputs:
+  ...
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template > parameters</h2>
+
+						<pre><code data-trim>
+parameters:
+  db_name:
+    type: string
+    description: WordPress database name
+    default: wordpress
+    constraints:
+      - length: { min: 1, max: 64 }
+        description: db_name must be between 1 and 64 characters
+      - allowed_pattern: '[a-zA-Z][a-zA-Z0-9]*'
+        description: >
+          db_name must begin with a letter and contain only alphanumeric
+          characters
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template - resources</h2>
+
+						<pre><code data-trim>
+resources:
+  wordpress_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image_id }
+      flavor: { get_param: instance_type }
+      key_name: { get_param: key_name }
+      user_data:
+        ...
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template - resource properties: user_data (1)</h2>
+
+						<pre><code data-trim>
+user_data:
+  str_replace:
+    template: |
+      #!/bin/bash -v
+
+      yum -y install mysql mysql-server httpd wordpress
+      systemctl enable mysqld.service
+      systemctl enable httpd.service
+      systemctl start mysqld.service
+      systemctl start httpd.service
+
+      firewall-cmd --add-service=http
+      firewall-cmd --permanent --add-service=http
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template - resource properties: user_data (2)</h2>
+
+						<pre><code data-trim>
+# Setup MySQL root password and create a user
+mysqladmin -u root password db_rootpassword
+cat << EOF | mysql -u root --password=db_rootpassword
+CREATE DATABASE db_name;
+GRANT ALL PRIVILEGES ON db_name.* TO "db_user"@"localhost"
+IDENTIFIED BY "db_password";
+FLUSH PRIVILEGES;
+EXIT
+EOF
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template - resources properties: user_data (3)</h2>
+
+						<pre><code data-trim>
+  sed -i "/Deny from All/d" /etc/httpd/conf.d/wordpress.conf
+  sed -i "s/Require local/Require all granted/" /etc/httpd/conf.d/wordpress.conf
+  sed -i s/database_name_here/db_name/ /etc/wordpress/wp-config.php
+  sed -i s/username_here/db_user/ /etc/wordpress/wp-config.php
+  sed -i s/password_here/db_password/ /etc/wordpress/wp-config.php
+
+  systemctl restart httpd.service
+params:
+  db_rootpassword: { get_param: db_root_password }
+  db_name: { get_param: db_name }
+  db_user: { get_param: db_username }
+  db_password: { get_param: db_password }
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Heat template - outputs</h2>
+
+						<pre><code data-trim>
+outputs:
+  WebsiteURL:
+    description: URL for Wordpress wiki
+    value:
+      str_replace:
+        template: http://host/wordpress
+        params:
+          host: { get_attr: [wordpress_instance, first_address] }
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>How to deploy an VM? - Solution #2</h2>
+						<pre><code data-trim>
+heat stack-create mystack --template-file=WordPress_Single_Instance.yaml
+  --parameters="db_name=$db_name;db_rootpassword=$db_rootpassword;..."
+						</code></pre>
+						<aside class="notes">
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Configuration</h2>
+					</section>
+
+					<section>
+						<h2>os-collect-config</h2>
+					</section>
+
+					<section>
+						<h2>Heat template > metadata</h2>
+
+						<pre><code data-trim>
+TODO: Heat metadata example
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>os-refresh-config</h2>
+					</section>
+
+					<section>
+						<h2>os-apply-config</h2>
+					</section>
+				</section>
+
+				<section>
+					<h2>VM vs baremetal</h2>
+					<p>
+						<ul>
+							<li>autodiscovery</li>
+							<li>hw specs</li>
+							<li>metrics</li>
+						</ul>
+
+					</p>
 				</section>
 
 				<section>
@@ -63,6 +299,10 @@
 
 					<section>
 						<h2>tripleo-image-elements</h2>
+					</section>
+
+					<section>
+						<h2>tripleo-image-elements - example</h2>
 					</section>
 
 					<section>
@@ -88,11 +328,48 @@
 
 				<section>
 					<section>
+						<h2>TripleO == OpenStack On OpenStack</h2>
+					</section>
+
+					<section>
+						<h2>In reality: TripleO == OpenStack on OpenStack on OpenStack</h2>
+					</section>
+
+					<section>
+						<h2>Infrastructure</h2>
+					</section>
+				</section>
+
+				<section>
+					<section>
 						<h2>Devtest</h2>
 					</section>
 
 					<section>
-						<h2>Seed</h2>
+						<h2>Seed - setup VM</h2>
+						<pre><code data-trim>
+setup-seed-vm -a $NODE_ARCH
+
+$TRIPLEO_ROOT/diskimage-builder/bin/ramdisk-image-create \
+    -a $NODE_ARCH $NODE_DIST $DEPLOY_IMAGE_ELEMENT \
+    -o $TRIPLEO_ROOT/deploy-ramdisk 2>&1 \
+    | tee $TRIPLEO_ROOT/dib-deploy.log
+
+boot-seed-vm -a $NODE_ARCH $NODE_DIST neutron-dhcp-agent 2>&1 | \
+    tee $TRIPLEO_ROOT/dib-seed.log
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Seed - register services</h2>
+						<pre><code data-trim>
+init-keystone -p unset unset 192.0.2.1 admin@example.com root@192.0.2.1
+
+setup-endpoints 192.0.2.1 --glance-password unset \
+                          --heat-password unset \
+                          --neutron-password unset \
+                          --nova-password unset
+						</code></pre>
 					</section>
 
 					<section>
@@ -103,6 +380,26 @@
 						<h2>Overcloud</h2>
 					</section>
 				</section>
+
+
+
+
+
+
+				<section>
+					<h2>Question</h2>
+				</section>
+
+				<section>
+					<h2>Feedback</h2>
+					<p>http://devconf.cz/f/16</p>
+				</section>
+
+
+
+
+
+
 
 				<section>
 					<h1>Reveal.js</h1>
@@ -437,8 +734,8 @@ function linkify( selector ) {
 				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
 				// Parallax scrolling
-				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
-				// parallaxBackgroundSize: '2100px 900px',
+				parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				parallaxBackgroundSize: '2100px 900px',
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
