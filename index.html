@@ -381,10 +381,297 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 				</section>
 
+				<section>
+					<section>
+						<h2>Overcloud deployment with Tuskar</h2>
+					</section>
 
+					<section>
+						<h2>Registering of baremetal nodes(manual)</h2>
+						[image of registering of node]
+					</section>
 
+					<section>
+						<h2>Deployment Role</h2>
+						<p>
+							<ul>
+								<li>Creates a group of baremetals acting the same role in the system. (E.g. nova compute)</li>
+								<li>Determines what hardware can be used in this role</li>
+								<li>Determines what image can be used in this role</li>
+								<li>Deployment is described by heat template</li>
+							</ul>
+						</p>
+					</section>
 
+					<section>
+						<h2>Limited for Icehouse</h2>
+						<p>
+							<ul>
+								<li>Controller (all services control planes)</li>
+								<li>Compute (Nova)</li>
+								<li>Object storage (Swift)</li>
+								<li>Block storage  (Cinder)</li>
+							</ul>
+						</p>
+					</section>
 
+					<section>
+						<h2>UI Deployment example</h2>
+						<p>
+							[role edit image from wireframe]
+						</p>
+					</section>
+
+					<section>
+						<h2>Deploying Overcloud</h2>
+						<p>
+							[CLI example]
+						</p>
+					</section>
+
+					<section>
+						<h2>Future(Juno) management of Deployment Roles</h2>
+						<p>
+							<ul>
+								<li>Asigning Image</li>
+								<li>Asigning Template</li>
+								<li>Asigning Hardware profiles (flavors)</li>
+							</ul>
+						</p>
+						<p>Then we are prepared to deploy any service on separate baremetals that can be easily scaled,
+				e.g. Neutron, Ceilometer, Ironic, etc....</p>
+					</section>
+
+					<section>
+						<h2>Possible Future with lxc</h2>
+						<p>
+							<ul>
+								<li>Preparing image and template for every possible standalone service</li>
+								<li>Deploying them on one machine or separates machines as needed</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Future possible needed services</h2>
+						<p>
+							<ul>
+								<li>Heat Template repository as Openstack service?</li>
+								<li>Image builder as a Openstack service?</li>
+							</ul>
+						</p>
+					</section>
+			    </section>
+				<section>
+					<section>
+						<h2>Tuskar overcloud monitoring</h2>
+					</section>
+
+					<section>
+						<h2>Monitoring of baremetals</h2>
+						<p>
+							<ul>
+								<li>Icehouse: monitoring via SNMP: cpu_util, memory, disk, network</li>
+								<li>Juno: monitoring via IPMI: Temperature, FAN Speed, Volt, etc. Plus pluggable architecture for vendor specific metrics.</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Storing and querying stats</h2>
+						<p>
+							<ul>
+								<li>Using Ceilometer as generic samples and meters storage</li>
+								<li>Using Ceilometer for querying statistics</li>
+								<li>Ceilometer is supporting many backends MongoDB, MySQL, PostgreSQL, HBase, DB2 (Elastic search in progress)</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Using D3 and rickshaw libraries for rendering charts</h2>
+						<p>
+							[image of linebar-char - page 19]
+						</p>
+					</section>
+
+					<section>
+						<h2>Future (Juno) Adding events to timeline to charts</h2>
+						<p>
+							<ul>
+								<li>Under each chart, there will be time line of events, as a context for chart data.</li>
+								<li>E.g. machine powered down, bad health, etc..</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Future (Juno) monitoring of running services</h2>
+						<p>
+							<ul>
+								<li>Extending Glance, so it can return list of services packed in image</li>
+								<li>Monitoring of services on each baremetal using Ceilometer</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Future(Juno) monitoring of the running services</h2>
+						<p>
+							<ul>
+								<li>[showing page with services statuses http://people.redhat.com/~jcoufal/openstack/tripleo/2014-01-10_tripleo-ui_deployment-management.pdf page 13]</li>
+							</ul>
+						</p>
+					</section>
+				</section>
+
+			    <section>
+					<section>
+						<h2>Tuskar overcloud management</h2>
+					</section>
+
+					<section>
+						<h2>Scaling of the Overcloud</h2>
+						<p>
+							[scaling page image]
+						</p>
+					</section>
+
+					<section>
+						<h2>Future(Juno) scaling of the overcloud</h2>
+						<p>
+							<ul>
+								<li>Choosing which resource to unprovision when downscaling, so
+				users can evacuate services running inside, before downscaling happens</li>
+								<li>Next:defining hooks for upscaling/downscaling so the evacuating behavior can
+				be defined on template level, so it will be automatic.</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Future(Juno) autoscaling of the overcloud</h2>
+						<p>
+							<ul>
+								<li>Autoscaling using Ceilometer alarms defined in the Heat template</li>
+								<li>Setting minimum and maximum of scaled instances in autoscaling group.</li>
+								<li>Future(Juno) Marking baremetals as expendable / critical</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Defining autoscaling group</h2>
+						<p><pre><code data-trim>
+
+WebServerGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: {'Fn::GetAZs': ''}
+      LaunchConfigurationName: {Ref: LaunchConfig}
+      MinSize: '1'
+      MaxSize: '3'
+      LoadBalancerNames:
+      - {Ref: ElasticLoadBalancer}
+      Tags:
+      - {Key: metering.server_group, Value: WebServerGroup}
+
+						</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Defining load balancer</h2>
+						<p><pre><code data-trim>
+
+ElasticLoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones: {'Fn::GetAZs': ''}
+      Listeners:
+      - {LoadBalancerPort: '80', InstancePort: '80',
+        Protocol: HTTP}
+      HealthCheck: {Target: 'HTTP:80/', HealthyThreshold: '3',
+        UnhealthyThreshold: '5', Interval: '30', Timeout: '5'}
+
+						</code></pre></p>
+					</section>
+
+				    <section>
+						<h2>Defining alarm</h2>
+						<p><pre><code data-trim>
+CPUAlarmHigh:
+    Type: OS::Ceilometer::Alarm
+    Properties:
+      description: Scale-up if the average CPU > 50% for 1 minute
+      meter_name: cpu_util
+      statistic: avg
+      period: '60'
+      evaluation_periods: '1'
+      threshold: '50'
+      alarm_actions:
+      - {"Fn::GetAtt": [WebServerScaleUpPolicy, AlarmUrl]}
+      matching_metadata: {'metadata.user_metadata.groupname': {Ref: 'WebServerGroup'}}
+      comparison_operator: gt
+	      				</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Defining policy</h2>
+						<p><pre><code data-trim>
+WebServerScaleUpPolicy:
+Type: AWS::AutoScaling::ScalingPolicy
+Properties:
+  AdjustmentType: ChangeInCapacity
+  AutoScalingGroupName: {Ref: WebServerGroup}
+  Cooldown: '60'
+  ScalingAdjustment: '1'
+						</code></pre></p>
+					</section>
+					<section>
+						<h2>Autoscaling of you application</h2>
+						<ul>
+							<li>Example above is taken from scaling of Wordpress</li>
+							<li>The same principle can be used for scaling baremetals (HOT scaling of nested stack)</li>
+							<li>It can be combined, as you application is scaling, the more hardware will be needed. That can be taken from e.g. other scaling down and releasing the hardware.</li>
+						</ul>
+					</section>
+
+				</section>
+
+			    <section>
+					<h2>Future(Juno) HA setup of Overcloud ????? ask jan</h2>
+					<p>
+						<ul>
+							<li>One of the most important goals for Juno release</li>
+							<li>Load balancer</li>
+							<li>Devtest already has some support now [figure out how it works]</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<section>
+						<h2>Different Architectures</h2>
+					</section>
+					<section>
+						<h2>Flat network topology</h2>
+						<p>
+							<ul>
+								<li>Right now we support the easiest architecture that is flat network under L2 switch</li>
+							</ul>
+						</p>
+					</section>
+					<section>
+						<h2>Future(Juno)</h2>
+						<p>
+							<ul>
+								<li>Distributed Spine/Leaf topology</li>
+								<li>Smaller failure domains, safer distributed network</li>
+								<li>[link to security guide from noszlp]</li>
+							</ul>
+						</p>
+					</section>
+				</section>
 
 				<section>
 					<h2>Question</h2>
