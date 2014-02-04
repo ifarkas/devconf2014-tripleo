@@ -388,7 +388,7 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 
 					<section>
 						<h2>Registering of baremetal nodes(manual)</h2>
-						[image of registering of node]
+						<img class="stretch" src="images/adding_overcloud_nodes.png"/>
 					</section>
 
 					<section>
@@ -403,6 +403,12 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						</p>
 					</section>
 
+
+					<section>
+						<h2>Deployment role example</h2>
+						<img class="stretch" src="images/adding_flavors_to_roles.png"/>
+					</section>
+
 					<section>
 						<h2>Limited for Icehouse</h2>
 						<p>
@@ -415,27 +421,19 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						</p>
 					</section>
 
-					<section>
-						<h2>UI Deployment example</h2>
-						<p>
-							[role edit image from wireframe]
-						</p>
-					</section>
 
 					<section>
-						<h2>Deploying Overcloud</h2>
-						<p>
-							[CLI example]
-						</p>
+						<h2>Deploying Overcloud example</h2>
+						<img class="stretch" src="images/deployment.png" />
 					</section>
 
 					<section>
 						<h2>Future(Juno) management of Deployment Roles</h2>
 						<p>
 							<ul>
-								<li>Asigning Image</li>
-								<li>Asigning Template</li>
-								<li>Asigning Hardware profiles (flavors)</li>
+								<li>Assigning Image</li>
+								<li>Assigning Template</li>
+								<li>Assigning Hardware profiles (flavors)</li>
 							</ul>
 						</p>
 						<p>Then we are prepared to deploy any service on separate baremetals that can be easily scaled,
@@ -443,7 +441,7 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 
 					<section>
-						<h2>Possible Future with lxc</h2>
+						<h2>Future(Juno) deploy all with lxc</h2>
 						<p>
 							<ul>
 								<li>Preparing image and template for every possible standalone service</li>
@@ -464,7 +462,7 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 			    </section>
 				<section>
 					<section>
-						<h2>Tuskar overcloud monitoring</h2>
+						<h2>Overcloud monitoring with Tuskar</h2>
 					</section>
 
 					<section>
@@ -490,16 +488,14 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 
 					<section>
 						<h2>Using D3 and rickshaw libraries for rendering charts</h2>
-						<p>
-							[image of linebar-char - page 19]
-						</p>
+						<img class="stretch" src="images/charts_example.png" />
 					</section>
 
 					<section>
-						<h2>Future (Juno) Adding events to timeline to charts</h2>
+						<h2>Future (Juno) Adding events timeline to charts</h2>
 						<p>
 							<ul>
-								<li>Under each chart, there will be time line of events, as a context for chart data.</li>
+								<li>Under the each chart, there will be a timeline of the events, as a context for the chart data.</li>
 								<li>E.g. machine powered down, bad health, etc..</li>
 							</ul>
 						</p>
@@ -517,24 +513,18 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 
 					<section>
 						<h2>Future(Juno) monitoring of the running services</h2>
-						<p>
-							<ul>
-								<li>[showing page with services statuses http://people.redhat.com/~jcoufal/openstack/tripleo/2014-01-10_tripleo-ui_deployment-management.pdf page 13]</li>
-							</ul>
-						</p>
+						<img class="stretch" src="images/service_monitoring.png" />
 					</section>
 				</section>
 
 			    <section>
 					<section>
-						<h2>Tuskar overcloud management</h2>
+						<h2>Overcloud management with Tuskar</h2>
 					</section>
 
 					<section>
 						<h2>Scaling of the Overcloud</h2>
-						<p>
-							[scaling page image]
-						</p>
+						<img class="stretch" src="images/scaling.png" />
 					</section>
 
 					<section>
@@ -628,25 +618,50 @@ Properties:
 						</code></pre></p>
 					</section>
 					<section>
-						<h2>Autoscaling of you application</h2>
+						<h2>FUTURE(Juno) Auto-scaling of you application</h2>
 						<ul>
 							<li>Example above is taken from scaling of Wordpress</li>
 							<li>The same principle can be used for scaling baremetals (HOT scaling of nested stack)</li>
 							<li>It can be combined, as you application is scaling, the more hardware will be needed. That can be taken from e.g. other scaling down and releasing the hardware.</li>
+							<li>Once the new hardware is plugged, it will be auto-discovered and auto-scaled.
 						</ul>
 					</section>
-
 				</section>
 
 			    <section>
-					<h2>Future(Juno) HA setup of Overcloud ????? ask jan</h2>
-					<p>
-						<ul>
-							<li>One of the most important goals for Juno release</li>
-							<li>Load balancer</li>
-							<li>Devtest already has some support now [figure out how it works]</li>
-						</ul>
-					</p>
+					<section>
+						<h2>Future(Juno) Running overcloud in HA</h2>
+					</section>
+					<section>
+						<h2>HA - done</h2>
+						<p>
+							<ul>
+								<li>HA proxy as image element</li>
+							</ul>
+						</p>
+					</section>
+					<section>
+						<h2>HA - in progress</h2>
+						<p>
+							<ul>
+								<li>AMQP - Rabit MQ in active-active mod</li>
+								<li>API instances - virtual IP - keepalived + HA proxy</li>
+								<li>DP - Mysql Percona XtraDB Cluster</li>
+							</ul>
+						</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Updates</h2>
+						<p>
+							<ul>
+								<li></li>
+								<li></li>
+							</ul>
+						</p>
+					</section>
 				</section>
 
 				<section>
