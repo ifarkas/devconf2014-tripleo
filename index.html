@@ -392,25 +392,38 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 
 					<section>
-						<h2>Deployment Role</h2>
+						<h2>Hardware profiles (Flavors)</h2>
 						<p>
 							<ul>
-								<li>Creates a group of baremetals acting the same role in the system. (E.g. nova compute)</li>
-								<li>Determines what hardware can be used in this role</li>
-								<li>Determines what image can be used in this role</li>
-								<li>Deployment is described by heat template</li>
+								<li>Standard openstack flavors with architecture field (x86/amd64) added</li>
+								<li>Heat uses nova-boot for provisioning, nova scheduler looks for available hardware by doing exact match of node specs with chosen flavor</li>
 							</ul>
 						</p>
 					</section>
 
-
 					<section>
-						<h2>Deployment role example</h2>
-						<img class="stretch" src="images/adding_flavors_to_roles.png"/>
+						<h2>Images</h2>
+						<p>
+							<ul>
+								<li>Created by image builder and uploaded to Glance.</li>
+							</ul>
+						</p>
 					</section>
 
 					<section>
-						<h2>Limited for Icehouse</h2>
+						<h2>Deployment Role</h2>
+						<p>
+							</ul>
+								<li>Creates a group of baremetals running the same group of services. (E.g. nova compute, block storage, etc.)</li>
+								<li>Relation to hardware profiles(flavors)</li>
+								<li>Relation to image</li>
+								<li>Relation to heat template</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<h2>Limited for these roles for Icehouse</h2>
 						<p>
 							<ul>
 								<li>Controller (all services control planes)</li>
@@ -421,6 +434,10 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						</p>
 					</section>
 
+					<section>
+						<h2>Deployment role example</h2>
+						<img class="stretch" src="images/adding_flavors_to_roles.png"/>
+					</section>
 
 					<section>
 						<h2>Deploying Overcloud example</h2>
@@ -428,7 +445,17 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 
 					<section>
-						<h2>Future(Juno) management of Deployment Roles</h2>
+						<h2>Deploying Overcloud example</h2>
+						<img class="stretch" src="images/deployment_in_progress.png" />
+					</section>
+
+					<section>
+						<h2>Deploying Overcloud example</h2>
+						<img class="stretch" src="images/deployed.png" />
+					</section>
+
+					<section>
+						<h2>Future (Juno) management of Deployment Roles</h2>
 						<p>
 							<ul>
 								<li>Assigning Image</li>
@@ -436,18 +463,9 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 								<li>Assigning Hardware profiles (flavors)</li>
 							</ul>
 						</p>
-						<p>Then we are prepared to deploy any service on separate baremetals that can be easily scaled,
-				e.g. Neutron, Ceilometer, Ironic, etc....</p>
-					</section>
-
-					<section>
-						<h2>Future(Juno) deploy all with lxc</h2>
-						<p>
-							<ul>
-								<li>Preparing image and template for every possible standalone service</li>
-								<li>Deploying them on one machine or separates machines as needed</li>
-							</ul>
-						</p>
+						<p>Then we are prepared to deploy any service on the separate baremetals, that can be
+							easily scaled, e.g. Neutron, Ceilometer, Ironic, etc....</p>
+					    <p>In future we will allow to provision multiple images on one machine with Docker.</p>
 					</section>
 
 					<section>
@@ -460,6 +478,7 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						</p>
 					</section>
 			    </section>
+
 				<section>
 					<section>
 						<h2>Overcloud monitoring with Tuskar</h2>
@@ -470,7 +489,8 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						<p>
 							<ul>
 								<li>Icehouse: monitoring via SNMP: cpu_util, memory, disk, network</li>
-								<li>Juno: monitoring via IPMI: Temperature, FAN Speed, Volt, etc. Plus pluggable architecture for vendor specific metrics.</li>
+								<li>Juno: monitoring via IPMI: Temperature, Fan Speed, Volt, etc. Plus
+									pluggable architecture for vendor specific metrics.</li>
 							</ul>
 						</p>
 					</section>
@@ -479,9 +499,11 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 						<h2>Storing and querying stats</h2>
 						<p>
 							<ul>
+								<li>Using Ceilometer agent for polling of the samples</li>
 								<li>Using Ceilometer as generic samples and meters storage</li>
 								<li>Using Ceilometer for querying statistics</li>
-								<li>Ceilometer is supporting many backends MongoDB, MySQL, PostgreSQL, HBase, DB2 (Elastic search in progress)</li>
+								<li>Ceilometer is supporting many backends MongoDB, MySQL, PostgreSQL,
+									HBase, DB2 (Elastic search in progress)</li>
 							</ul>
 						</p>
 					</section>
@@ -492,11 +514,11 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 
 					<section>
-						<h2>Future (Juno) Adding events timeline to charts</h2>
+						<h2>Future (Juno) Adding 'events time-line' to charts</h2>
 						<p>
 							<ul>
-								<li>Under the each chart, there will be a timeline of the events, as a context for the chart data.</li>
-								<li>E.g. machine powered down, bad health, etc..</li>
+								<li>Under the each chart, there will be a time-line of the events, as a context for the chart data.</li>
+								<li>E.g. machine updated, powered down, bad health, etc..</li>
 							</ul>
 						</p>
 					</section>
@@ -528,139 +550,47 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 					</section>
 
 					<section>
-						<h2>Future(Juno) scaling of the overcloud</h2>
+						<h2>Downscaling of the overcloud</h2>
 						<p>
 							<ul>
+								<li>Deleting resource manually then update stack.</li>
 								<li>Choosing which resource to unprovision when downscaling, so
 				users can evacuate services running inside, before downscaling happens</li>
-								<li>Next:defining hooks for upscaling/downscaling so the evacuating behavior can
+								<li>Next: defining hooks for upscaling/downscaling so the evacuating behavior can
 				be defined on template level, so it will be automatic.</li>
 							</ul>
 						</p>
 					</section>
 
 					<section>
-						<h2>Future(Juno) autoscaling of the overcloud</h2>
+						<h2>Future (Juno) Auto-scaling of the overcloud</h2>
 						<p>
 							<ul>
-								<li>Autoscaling using Ceilometer alarms defined in the Heat template</li>
-								<li>Setting minimum and maximum of scaled instances in autoscaling group.</li>
-								<li>Future(Juno) Marking baremetals as expendable / critical</li>
+								<li>We are waiting on ability to scale nested stacks, implemented in Heat</li>
+								<li>Auto-scaling using Ceilometer alarms defined in the Heat template </li>
+								<li>Auto-scaling with conditions we need, e.g. cpu_util bigger than 50% for 1 munute
 							</ul>
 						</p>
 					</section>
 
 					<section>
-						<h2>Defining autoscaling group</h2>
-						<p><pre><code data-trim>
-
-WebServerGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      AvailabilityZones: {'Fn::GetAZs': ''}
-      LaunchConfigurationName: {Ref: LaunchConfig}
-      MinSize: '1'
-      MaxSize: '3'
-      LoadBalancerNames:
-      - {Ref: ElasticLoadBalancer}
-      Tags:
-      - {Key: metering.server_group, Value: WebServerGroup}
-
-						</code></pre></p>
-					</section>
-
-					<section>
-						<h2>Defining load balancer</h2>
-						<p><pre><code data-trim>
-
-ElasticLoadBalancer:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
-    Properties:
-      AvailabilityZones: {'Fn::GetAZs': ''}
-      Listeners:
-      - {LoadBalancerPort: '80', InstancePort: '80',
-        Protocol: HTTP}
-      HealthCheck: {Target: 'HTTP:80/', HealthyThreshold: '3',
-        UnhealthyThreshold: '5', Interval: '30', Timeout: '5'}
-
-						</code></pre></p>
-					</section>
-
-				    <section>
-						<h2>Defining alarm</h2>
-						<p><pre><code data-trim>
-CPUAlarmHigh:
-    Type: OS::Ceilometer::Alarm
-    Properties:
-      description: Scale-up if the average CPU > 50% for 1 minute
-      meter_name: cpu_util
-      statistic: avg
-      period: '60'
-      evaluation_periods: '1'
-      threshold: '50'
-      alarm_actions:
-      - {"Fn::GetAtt": [WebServerScaleUpPolicy, AlarmUrl]}
-      matching_metadata: {'metadata.user_metadata.groupname': {Ref: 'WebServerGroup'}}
-      comparison_operator: gt
-	      				</code></pre></p>
-					</section>
-
-					<section>
-						<h2>Defining policy</h2>
-						<p><pre><code data-trim>
-WebServerScaleUpPolicy:
-Type: AWS::AutoScaling::ScalingPolicy
-Properties:
-  AdjustmentType: ChangeInCapacity
-  AutoScalingGroupName: {Ref: WebServerGroup}
-  Cooldown: '60'
-  ScalingAdjustment: '1'
-						</code></pre></p>
-					</section>
-					<section>
-						<h2>FUTURE(Juno) Auto-scaling of you application</h2>
+						<h2>FUTURE (Juno) Auto-scaling examples</h2>
 						<ul>
-							<li>Example above is taken from scaling of Wordpress</li>
-							<li>The same principle can be used for scaling baremetals (HOT scaling of nested stack)</li>
-							<li>It can be combined, as you application is scaling, the more hardware will be needed. That can be taken from e.g. other scaling down and releasing the hardware.</li>
-							<li>Once the new hardware is plugged, it will be auto-discovered and auto-scaled.
+							<li>Newly plugged hardware can be auto-discovered and auto-scaled.</li>
+							<li>It can be combined, as you application is scaling, the more hardware will be needed.
+							That can be taken from e.g. other scaling down and releasing the hardware.</li>
 						</ul>
 					</section>
 				</section>
 
 			    <section>
 					<section>
-						<h2>Future(Juno) Running overcloud in HA</h2>
-					</section>
-					<section>
-						<h2>HA - done</h2>
-						<p>
-							<ul>
-								<li>HA proxy as image element</li>
-							</ul>
-						</p>
-					</section>
-					<section>
-						<h2>HA - in progress</h2>
-						<p>
-							<ul>
-								<li>AMQP - Rabit MQ in active-active mod</li>
-								<li>API instances - virtual IP - keepalived + HA proxy</li>
-								<li>DP - Mysql Percona XtraDB Cluster</li>
-							</ul>
-						</p>
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Updates</h2>
-						<p>
-							<ul>
-								<li></li>
-								<li></li>
-							</ul>
-						</p>
+						<h2>Running overcloud in HA</h2>
+						<ul>
+							<li>AMQP - Rabit MQ cluster in active-active</li>
+							<li>Openstack API instances - Virtual IP and keepalived + HA proxy</li>
+							<li>DB - Mysql Percona XtraDB Cluster</li>
+						</ul>
 					</section>
 				</section>
 
@@ -668,24 +598,59 @@ Properties:
 					<section>
 						<h2>Different Architectures</h2>
 					</section>
+
 					<section>
-						<h2>Flat network topology</h2>
+						<h2>Flat network topology under one L2 switch</h2>
+						Advantages:
 						<p>
 							<ul>
-								<li>Right now we support the easiest architecture that is flat network under L2 switch</li>
+								<li>Easy to install and upgrade </li>
+							</ul>
+						</p>
+						Disadvantages:
+						<p>
+							<ul>
+								<li>Possible performance issues when bringing up a large number of machines.</li>
+								<li>Large failure domain.</li>
 							</ul>
 						</p>
 					</section>
+
 					<section>
-						<h2>Future(Juno)</h2>
+						<h2>Future(Juno) Distributed Spine/Leaf topology</h2>
+						Advantages:
 						<p>
 							<ul>
-								<li>Distributed Spine/Leaf topology</li>
-								<li>Smaller failure domains, safer distributed network</li>
-								<li>[link to security guide from noszlp]</li>
+								<li>Complies to the security guide: http://docs.openstack.org/sec/</li>
+								<li>Smaller failure domain.</li>
+								<li>Better security due to IPMI isolation within the rack.</li>
+							</ul>
+						</p>
+						Disadvantages:
+						<p>
+							<ul>
+								<li>Additional image management of the Leaf Node image</li>
+								<li>Additional rack space wasted for the Leaf Node</li>
 							</ul>
 						</p>
 					</section>
+				</section>
+
+				<section>
+					<h2>Tuskar API and Tuskar-UI summary</h2>
+					<p>
+						<ul>
+							<li>Deploy overcloud</li>
+							<li>Monitor overcloud</li>
+							<li>Manage overcloud</li>
+							<ul>
+								<li>Scale</li>
+								<li>Auto-scale</li>
+								<li>Update</li>
+							</ul>
+						</ul>
+					</p>
+
 				</section>
 
 				<section>
