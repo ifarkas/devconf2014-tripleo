@@ -48,7 +48,7 @@
 					<h2>Agenda</h2>
 					<p>
 						<ul>
-							<li>TripleO projects</li>
+							<li>TripleO tools</li>
 							<li>How to deploy OpenStack?</li>
 							<li>Architecture</li>
 							<li>Tuskar & Tuskar-UI</li>
@@ -119,9 +119,9 @@ wget http://download.fedoraproject.org/pub/fedora/linux/releases/20/
 				<section>
 					<h2>How to deploy a VM? - Solution #1</h2>
 					<pre><code data-trim>
-nova boot myCentOSServer \
-  --image "3afe97b2-26dc-49c5-a2cc-a2fc8d80c001" \
-  --flavor m1.small
+nova boot myCentOSServer
+          --image "3afe97b2-26dc-49c5-a2cc-a2fc8d80c001"
+          --flavor m1.small
 					</code></pre>
 
 					<p>Use Puppet, Chef, Ansible or whatever for configuration</p>
@@ -264,8 +264,9 @@ outputs:
 					<section>
 						<h2>How to deploy an VM? - Solution #2</h2>
 						<pre><code data-trim>
-heat stack-create mystack --template-file=WordPress_Single_Instance.yaml
-  --parameters="db_name=$db_name;db_rootpassword=$db_rootpassword;..."
+heat stack-create mystack
+                  --template-file=WordPress_Single_Instance.yaml
+                  --parameters="db_name=$db_name;db_rootpassword=..."
 						</code></pre>
 					</section>
 
@@ -352,8 +353,8 @@ heat stack-create mystack --template-file=WordPress_Single_Instance.yaml
 					</section>
 
 					<section>
-						<h2>Fedora diskimage-builder element example</h2>
-						<pre><code data-trim>
+						<h2>element example: Fedora</h2>
+						<p><pre><code data-trim>
 bin/install-packages
 bin/map-packages
 bin/map-services
@@ -370,7 +371,10 @@ root.d/10-fedora-cloud-image
 README.md
 element-deps
 source-repository-fedora
-						</code></pre>
+						</code></pre></p>
+						<aside class="notes">
+							dib-run-parts
+						</aside>
 					</section>
 				</section>
 
@@ -468,7 +472,7 @@ auth_url = http://{{keystone.host}}:35357/v2.0
 					</section>
 
 					<section>
-						<h2>Nova image-element example</h2>
+						<h2>element example: Nova</h2>
 						<pre><code data-trim>
 install.d/nova-source-install/74-nova
 os-apply-config/etc/nova/nova.conf
@@ -737,7 +741,7 @@ setup-endpoints $OVERCLOUD_IP --cinder-password $OVERCLOUD_CINDER_PASSWORD
 					<h1>So far...</h1>
 					<p>
 						<ul>
-							<li>TripleO projects</li>
+							<li>TripleO tools</li>
 							<li>How to deploy OpenStack?</li>
 							<li>Architecture</li>
 						</ul>
@@ -987,9 +991,9 @@ setup-endpoints $OVERCLOUD_IP --cinder-password $OVERCLOUD_CINDER_PASSWORD
 					<h2>Questions</h2>
 				</section>
 
-				<section>
-					<h2>Feedback</h2>
-					<p>http://devconf.cz/f/16</p>
+				<section data-background="images/134-ducklings-1920x1080-animal-wallpaper.jpg">
+					<h2>Thanks for your attention!</h2>
+					<h3>Give us feedback! http://devconf.cz/f/16</h3>
 					<img class="stretch" src="images/cutest-cat.jpg"/>
 				</section>
 			</div>
@@ -1004,7 +1008,7 @@ setup-endpoints $OVERCLOUD_IP --cinder-password $OVERCLOUD_CINDER_PASSWORD
 			// Full list of configuration options available here:
 			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
-				controls: true,
+				controls: false,
 				progress: true,
 				history: true,
 				center: true,
