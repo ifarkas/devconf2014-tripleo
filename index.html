@@ -44,49 +44,76 @@
 					</p>
 				</section>
 
+				<section data-background="images/l3BKgPQ.jpg">
+					<h2>Agenda</h2>
+					<p>
+						<ul>
+							<li>TripleO projects</li>
+							<li>How to deploy OpenStack?</li>
+							<li>Architecture</li>
+							<li>Tuskar & Tuskar-UI</li>
+							<li>Advanced features</li>
+						</ul>
+					</p>
+				</section>
+
 				<section>
 					<h2>What is TripleO?</h2>
 					<p>
 						<blockquote cite="https://wiki.openstack.org/wiki/TripleO">
-							&ldquo;TripleO is a program aimed at installing, upgrading and operating OpenStack clouds using OpenStack's own cloud facilities as the foundations - building on Nova, Neutron Heat and Ironic to automate fleet management at datacentre scale (and scaling down to as few as 2 machines).&rdquo;
+							&ldquo;TripleO is a program aimed at installing, upgrading and operating OpenStack clouds using OpenStack's own cloud facilities as the foundations - building on Nova, Neutron, Heat and Ironic to automate fleet management at datacenter scale (and scaling down to as few as 2 machines).&rdquo;
 						</blockquote>
 					</p>
 					<aside class="notes">
-						Hello World!
+						<ul>
+							<li>deploy OpenStack</li>
+							<li>using OpenStack</li>
+							<li>baremetal machines</li>
+							<li>datacenter scale</li>
+						</ul>
 					</aside>
 				</section>
 
-				<section>
-					<h2>Goals</h2>
+<!-- 				<section>
+					<h2>What is TripleO? - Goals</h2>
 					<p>
 						<ul>
 							<li>deploy OpenStack</li>
 							<li>using OpenStack</li>
-							<li>on baremetal machines</li>
-							<li>at datacentre scale</li>
-							<li>CI/CD pipeline</li>
-							<li>upgrades</li>
-							<li>operating</li>
+							<li>baremetal machines</li>
+							<li>datacenter scale</li>
 						</ul>
 					</p>
-					<aside class="notes">
-						CI/CD pipeline: application + library updates, installation and removal of packages, operation system version updates
-					</aside>
-				</section>
+				</section> -->
 
 				<section>
 					<section id="fragments">
-						<h2>How to deploy a VM?</h2>
-						<p class="fragment">Goal: deploy an image using OpenStack and configure it</p>
+						<h2>How to launch an application?</h2>
 						<ol>
 							<li class="fragment">grab an image</li>
 							<li class="fragment">deploy</li>
 							<li class="fragment">configure</li>
 						</ol>
-
-						<aside class="notes">
-						</aside>
 					</section>
+				</section>
+
+				<section>
+					<h2>Grab an image</h2>
+					<p>
+						<pre><code data-trim>
+wget http://download.fedoraproject.org/pub/fedora/linux/releases/20/
+            Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2
+						</code></pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>How to launch an application?</h2>
+					<ol>
+						<li><strike>grab an image</strike></li>
+						<li><strong>deploy</strong></li>
+						<li>configure</li>
+					</ol>
 				</section>
 
 				<section>
@@ -98,22 +125,18 @@ nova boot myCentOSServer \
 					</code></pre>
 
 					<p>Use Puppet, Chef, Ansible or whatever for configuration</p>
-					<aside class="notes">
-					</aside>
 				</section>
 
 				<section>
 					<section>
 						<h2>How to deploy a VM? - Solution #2</h2>
 						<p><strong>Use Heat!</strong></p>
-						<aside class="notes">
-						</aside>
 					</section>
 
 					<section>
 						<h2>Heat template</h2>
 
-						<pre><code data-trim>
+						<p><pre><code data-trim>
 heat_template_version: 2013-05-23
 
 description:
@@ -127,11 +150,14 @@ resources:
 
 outputs:
   ...
-						</code></pre>
+						</code></pre></p>
+						<aside class="notes">
+							Just an overview, in-depth coming on next slides!
+						</aside>
 					</section>
 
 					<section>
-						<h2>Heat template > parameters</h2>
+						<h2>Heat template - parameters</h2>
 
 						<pre><code data-trim>
 parameters:
@@ -185,7 +211,7 @@ user_data:
 						</code></pre>
 					</section>
 
-					<section>
+<!-- 					<section>
 						<h2>Heat template - resource properties: user_data (2)</h2>
 
 						<pre><code data-trim>
@@ -218,7 +244,7 @@ params:
   db_user: { get_param: db_username }
   db_password: { get_param: db_password }
 						</code></pre>
-					</section>
+					</section> -->
 
 					<section>
 						<h2>Heat template - outputs</h2>
@@ -241,9 +267,120 @@ outputs:
 heat stack-create mystack --template-file=WordPress_Single_Instance.yaml
   --parameters="db_name=$db_name;db_rootpassword=$db_rootpassword;..."
 						</code></pre>
+					</section>
+
+					<section>
+						<h2>tripleo-heat-templates</h2>
 						<aside class="notes">
+							This is how heat works and this is how we use it in TripleO!
 						</aside>
 					</section>
+				</section>
+
+				<section>
+					<h2>How to launch an application?</h2>
+					<ol>
+						<li><strong><strike>grab</strike>/build an image</strong></li>
+						<li><strike>deploy</strike></li>
+						<li>configure</li>
+					</ol>
+				</section>
+
+				<section>
+					<section>
+						<h2>Image building</h2>
+					</section>
+
+					<section>
+						<h2>The goal of image building in TripleO</h2>
+						<p>
+							<blockquote cite="https://github.com/openstack/diskimage-builder/blob/master/README.md">
+								&ldquo;The goal of the image building process is to produce blank slate machines that have all the necessary bits to fulfill a specific purpose in the running of an Openstack cloud: e.g. a nova-compute node.&rdquo;
+							</blockquote>
+						</p>
+					</section>
+
+					<section>
+						<h2>diskimage-builder</h2>
+						<p>
+							<ul>
+								<li>disk images / file system images / ramdisk images</li>
+								<li>virtual / baremetal machines</li>
+								<li>stock of elements</li>
+								<li>easily extensible</li>
+							</ul>
+						</p>
+						<aside class="notes">
+							An element is a particular set of code that alters how the image is built, or runs within the chroot to prepare the image.
+						</aside>
+					</section>
+
+<!-- 					<section>
+						<h2>diskimage-builder</h2>
+						<p>
+							<ul>
+								<li>creates a tmpfs mount to build the image in</li>
+								<li>image is built using a chroot </li>
+								<li>bind mounted /proc /sys and /dev</li>
+							</ul>
+						</p>
+					</section> -->
+
+					<section>
+						<h2>diskimage-builder</h2>
+						<h3>Scripts execution phases</h3>
+						<p>
+							<ul>
+								<li>root.d</li>
+								<li>finalise.d</li>
+								<li>cleanup.d</li>
+								<li>block-device.d</li>
+								<li>extra-data.d</li>
+								<li>pre-install.d</li>
+								<li>install.d</li>
+								<li>post-install.d</li>
+								<li>environment.d</li>
+							</ul>
+						</p>
+						<aside class="notes">
+							<ul>
+								<li>creates a tmpfs mount to build the image in</li>
+								<li>image is built using a chroot and bind mounted /proc /sys and /dev</li>
+								<li>once the file system tree is assembled a loopback device with filesystem (or partition table and file system) is created and the tree copied into it.</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Fedora diskimage-builder element example</h2>
+						<pre><code data-trim>
+bin/install-packages
+bin/map-packages
+bin/map-services
+finalise.d/01-clean-old-kernels.sh
+finalise.d/99-setup-first-boot
+install.d/00-fedora-fixup-audit
+install.d/00-fedora-fixup-openssl
+install.d/00-fedora-fixup-pyopenssl
+install.d/01-install-deps
+pre-install.d/15-fedora-remove-grub
+pre-install.d/00-usr-local-bin-secure-path
+pre-install.d/02-lsb
+root.d/10-fedora-cloud-image
+README.md
+element-deps
+source-repository-fedora
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<h2>How to launch an application?</h2>
+					<ol>
+						<li><strike>grab/build an image</strike></li>
+						<li><strike>deploy</strike></li>
+						<li><strong>configure</strong></li>
+					</ol>
 				</section>
 
 				<section>
@@ -253,38 +390,116 @@ heat stack-create mystack --template-file=WordPress_Single_Instance.yaml
 
 					<section>
 						<h2>os-collect-config</h2>
+						<pre><code data-trim>
+[default]
+command=os-refresh-config
+
+[cfn]
+metadata_url=http://192.0.2.99:8000/v1/
+access_key_id = ABCDEFGHIJLMNOP01234567890
+secret_access_key = 01234567890ABCDEFGHIJKLMNOP
+path = MyResource
+stack_name = my.stack
+						</code></pre>
 					</section>
 
 					<section>
-						<h2>Heat template > metadata</h2>
-
+						<h2>Heat template - metadata</h2>
 						<pre><code data-trim>
-TODO: Heat metadata example
+resources:
+  wordpress_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image_id }
+        ...
+      metadata:
+        key: value
 						</code></pre>
 					</section>
 
 					<section>
 						<h2>os-refresh-config</h2>
+						<p>
+							<h3>Scripts execution phases</h3>
+							<ul>
+								<li>pre-configure.d</li>
+								<li>configure.d</li>
+								<li>migration.d</li>
+								<li>post-configure.d</li>
+							</il>
+						</p>
 					</section>
 
 					<section>
 						<h2>os-apply-config</h2>
+						<p>converts JSON file to service config</p>
+						<pre><code data-trim>
+{"keystone": {"database": {"host": "127.0.0.1",
+                           "user": "keystone",
+                           "password": "foobar"}}}
+						</code></pre>
+
+						<pre><code data-trim>
+[sql]
+connection = mysql://keystone:foobar@127.0.0.1/keystone
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>mustache template example</h2>
+						<pre><code data-trim>
+[database]
+connection={{tuskar.db}}
+
+[heat_keystone]
+username = {{tuskar.user}}
+tenant_name = {{tuskar.tenant_name}}
+password = {{tuskar.password}}
+auth_url = http://{{keystone.host}}:35357/v2.0
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>tripleo-image-elements</h2>
+					</section>
+
+					<section>
+						<h2>diskimage-builder/elements vs tripleo-image-elements</h2>
+					</section>
+
+					<section>
+						<h2>Nova image-element example</h2>
+						<pre><code data-trim>
+install.d/nova-source-install/74-nova
+os-apply-config/etc/nova/nova.conf
+os-refresh-config/configure.d/10-nova-state
+pre-install.d/00-disable-requiretty
+README.md
+element-deps
+source-repository-nova
+						</code></pre>
 					</section>
 				</section>
 
 				<section>
-					<h2>VM vs baremetal</h2>
-					<p>
-						<ul>
-							<li>autodiscovery</li>
-							<li>hw specs</li>
-							<li>metrics</li>
-						</ul>
+					<section>
+						<h2>VM vs baremetal</h2>
+						<p>
+							<ul>
+								<li>pxe boot</li>
+								<li>autodiscovery</li>
+								<li>hw specs</li>
+								<li>perf metrics</li>
+							</ul>
+						</p>
+					</section>
 
-					</p>
+					<section>
+						<h2>Ironic</h2>
+					</section>
 				</section>
 
-				<section>
+<!-- 				<section>
 					<section>
 						<h2>Tools</h2>
 					</section>
@@ -302,19 +517,15 @@ TODO: Heat metadata example
 					</section>
 
 					<section>
-						<h2>tripleo-image-elements - example</h2>
-					</section>
-
-					<section>
-						<h2>os-apply-config</h2>
-					</section>
-
-					<section>
 						<h2>os-collect-config</h2>
 					</section>
 
 					<section>
 						<h2>os-refresh-config</h2>
+					</section>
+
+					<section>
+						<h2>os-apply-config</h2>
 					</section>
 
 					<section>
@@ -324,7 +535,7 @@ TODO: Heat metadata example
 					<section>
 						<h2>tuskar & tuskar-ui</h2>
 					</section>
-				</section>
+				</section> -->
 
 				<section>
 					<section>
@@ -336,7 +547,38 @@ TODO: Heat metadata example
 					</section>
 
 					<section>
-						<h2>Infrastructure</h2>
+						<h2>Architecture</h2>
+					</section>
+
+					<section>
+						<h2>Overcloud</h2>
+					</section>
+
+					<section>
+						<h2>Undercloud</h2>
+					</section>
+
+					<section>
+						<h2>Seed</h2>
+					</section>
+
+					<section>
+						<h2>Workflow</h2>
+					</section>
+
+					<section>
+						<h2>Seed</h2>
+						<img class="stretch" src="images/seed.jpg"/>
+					</section>
+
+					<section>
+						<h2>Deploy Undercloud</h2>
+						<img class="stretch" src="images/undercloud-deploy.jpg"/>
+					</section>
+
+					<section>
+						<h2>Deploy Overcloud</h2>
+						<img class="stretch" src="images/overcloud-deploy.jpg"/>
 					</section>
 				</section>
 
@@ -352,11 +594,9 @@ setup-seed-vm -a $NODE_ARCH
 
 $TRIPLEO_ROOT/diskimage-builder/bin/ramdisk-image-create \
     -a $NODE_ARCH $NODE_DIST $DEPLOY_IMAGE_ELEMENT \
-    -o $TRIPLEO_ROOT/deploy-ramdisk 2>&1 \
-    | tee $TRIPLEO_ROOT/dib-deploy.log
+    -o $TRIPLEO_ROOT/deploy-ramdisk
 
-boot-seed-vm -a $NODE_ARCH $NODE_DIST neutron-dhcp-agent 2>&1 | \
-    tee $TRIPLEO_ROOT/dib-seed.log
+boot-seed-vm -a $NODE_ARCH $NODE_DIST neutron-dhcp-agent
 						</code></pre>
 					</section>
 
@@ -365,20 +605,143 @@ boot-seed-vm -a $NODE_ARCH $NODE_DIST neutron-dhcp-agent 2>&1 | \
 						<pre><code data-trim>
 init-keystone -p unset unset 192.0.2.1 admin@example.com root@192.0.2.1
 
-setup-endpoints 192.0.2.1 --glance-password unset \
-                          --heat-password unset \
-                          --neutron-password unset \
+setup-endpoints 192.0.2.1 --glance-password unset
+                          --heat-password unset
+                          --neutron-password unset
                           --nova-password unset
 						</code></pre>
 					</section>
 
 					<section>
-						<h2>Undercloud</h2>
+						<h2>Undercloud - create image</h2>
+						<p><pre><code data-trim>
+$TRIPLEO_ROOT/diskimage-builder/bin/disk-image-create $NODE_DIST
+    -a $NODE_ARCH -o $TRIPLEO_ROOT/undercloud
+    boot-stack nova-baremetal os-collect-config dhcp-all-interfaces
+    neutron-dhcp-agent
+
+UNDERCLOUD_ID=$(load-image $TRIPLEO_ROOT/undercloud.qcow2)
+						</code></pre></p>
 					</section>
 
 					<section>
-						<h2>Overcloud</h2>
+						<h2>Undercloud - deploy with Heat</h2>
+						<p><pre><code data-trim>
+make -C $TRIPLEO_ROOT/tripleo-heat-templates undercloud-vm.yaml
+
+heat stack-create
+    -f $TRIPLEO_ROOT/tripleo-heat-templates/undercloud-vm.yaml
+    -P "PowerUserName=$(whoami);AdminToken=${UNDERCLOUD_ADMIN_TOKEN};
+        AdminPassword=${UNDERCLOUD_ADMIN_PASSWORD};
+        GlancePassword=${UNDERCLOUD_GLANCE_PASSWORD};
+        HeatPassword=${UNDERCLOUD_HEAT_PASSWORD};
+        NeutronPassword=${UNDERCLOUD_NEUTRON_PASSWORD};
+        NovaPassword=${UNDERCLOUD_NOVA_PASSWORD};
+        BaremetalArch=${NODE_ARCH};
+        PowerManager=$POWER_MANAGER;
+        undercloudImage=${UNDERCLOUD_ID}"
+    undercloud
+						</code></pre></p>
 					</section>
+
+					<section>
+						<h2>Undercloud - register services</h2>
+						<p><pre><code data-trim>
+init-keystone -p $UNDERCLOUD_ADMIN_PASSWORD $UNDERCLOUD_ADMIN_TOKEN
+    $UNDERCLOUD_IP admin@example.com heat-admin@$UNDERCLOUD_IP
+
+setup-endpoints $UNDERCLOUD_IP
+                --glance-password $UNDERCLOUD_GLANCE_PASSWORD
+                --heat-password $UNDERCLOUD_HEAT_PASSWORD
+                --neutron-password $UNDERCLOUD_NEUTRON_PASSWORD
+                --nova-password $UNDERCLOUD_NOVA_PASSWORD
+						</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Overcloud - create the control image</h2>
+						<p><pre><code data-trim>
+$TRIPLEO_ROOT/diskimage-builder/bin/disk-image-create $NODE_DIST
+    -a $NODE_ARCH -o $TRIPLEO_ROOT/overcloud-control
+    boot-stack cinder-api cinder-volume os-collect-config
+    neutron-network-node dhcp-all-interfaces swift-proxy swift-storage
+
+OVERCLOUD_CONTROL_ID=$(load-image -d $TRIPLEO_ROOT/overcloud-control.qcow2)
+						</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Overcloud - create the compute image</h2>
+						<p><pre><code data-trim>
+$TRIPLEO_ROOT/diskimage-builder/bin/disk-image-create $NODE_DIST \
+    -a $NODE_ARCH -o $TRIPLEO_ROOT/overcloud-compute \
+    nova-compute nova-kvm neutron-openvswitch-agent os-collect-config \
+    dhcp-all-interfaces
+
+OVERCLOUD_COMPUTE_ID=$(load-image -d $TRIPLEO_ROOT/overcloud-compute.qcow2)
+						</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Undercloud - deploy with Heat</h2>
+						<p><pre><code data-trim>
+make -C $TRIPLEO_ROOT/tripleo-heat-templates overcloud.yaml
+
+heat stack-create -f $TRIPLEO_ROOT/tripleo-heat-templates/overcloud.yaml
+    -P "AdminToken=${OVERCLOUD_ADMIN_TOKEN};
+        AdminPassword=${OVERCLOUD_ADMIN_PASSWORD};
+        CinderPassword=${OVERCLOUD_CINDER_PASSWORD};
+        GlancePassword=${OVERCLOUD_GLANCE_PASSWORD};
+        HeatPassword=${OVERCLOUD_HEAT_PASSWORD};
+        NeutronPassword=${OVERCLOUD_NEUTRON_PASSWORD};
+        NovaPassword=${OVERCLOUD_NOVA_PASSWORD};
+        NeutronPublicInterface=${NeutronPublicInterface};
+        SwiftPassword=${OVERCLOUD_SWIFT_PASSWORD};
+        SwiftHashSuffix=${OVERCLOUD_SWIFT_HASH}${OVERCLOUD_LIBVIRT_TYPE};
+        SSLCertificate=${OVERCLOUD_SSL_CERT};SSLKey=${OVERCLOUD_SSL_KEY}"
+    overcloud
+						</code></pre></p>
+					</section>
+
+					<section>
+						<h2>Undercloud - register services</h2>
+						<p><pre><code data-trim>
+init-keystone -p $OVERCLOUD_ADMIN_PASSWORD $OVERCLOUD_ADMIN_TOKEN
+    $OVERCLOUD_IP admin@example.com heat-admin@$OVERCLOUD_IP
+    ${SSLBASE:+--ssl $PUBLIC_API_URL}
+
+setup-endpoints $OVERCLOUD_IP --cinder-password $OVERCLOUD_CINDER_PASSWORD
+    --glance-password $OVERCLOUD_GLANCE_PASSWORD
+    --heat-password $OVERCLOUD_HEAT_PASSWORD
+    --neutron-password $OVERCLOUD_NEUTRON_PASSWORD
+    --nova-password $OVERCLOUD_NOVA_PASSWORD
+    --swift-password $OVERCLOUD_SWIFT_PASSWORD
+    ${SSLBASE:+--ssl $PUBLIC_API_URL}
+						</code></pre></p>
+					</section>
+				</section>
+
+				<section>
+					<h2>CI/CD pipeline</h2>
+
+					<aside class="notes">
+						application + library updates, installation and removal of packages, operation system version updates
+					</aside>
+				</section>
+
+				<section>
+					<h2>Updates</h2>
+				</section>
+
+				<section data-background="images/l3BKgPQ.jpg">
+					<h1>So far...</h1>
+					<p>
+						<ul>
+							<li>TripleO projects</li>
+							<li>How to deploy OpenStack?</li>
+							<li>Architecture</li>
+						</ul>
+					</p>
 				</section>
 
 				<section>
@@ -654,12 +1017,23 @@ setup-endpoints 192.0.2.1 --glance-password unset \
 				</section>
 
 				<section>
-					<h2>Question</h2>
+					<h2>Resources</h2>
+					<p>
+						<ul>
+							<li>https://wiki.openstack.org/wiki/TripleO</li>
+							<li>http://docs.openstack.org/developer/tripleo-incubator/</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Questions</h2>
 				</section>
 
 				<section>
 					<h2>Feedback</h2>
 					<p>http://devconf.cz/f/16</p>
+					<img class="stretch" src="images/cutest-cat.jpg"/>
 				</section>
 
 
@@ -1001,7 +1375,7 @@ function linkify( selector ) {
 				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 
 				// Parallax scrolling
-				parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				parallaxBackgroundImage: 'images/reveal-parallax-1.jpg',
 				parallaxBackgroundSize: '2100px 900px',
 
 				// Optional libraries used to extend on reveal.js
